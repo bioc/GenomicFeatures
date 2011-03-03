@@ -56,7 +56,7 @@ makeTranscriptDbFromBiomart(biomart="ensembl",
     \item bacterial_mart_7: ENSEMBL BACTERIA 7 (EBI UK)
     \item fungal_mart_7: ENSEMBL FUNGAL 7 (EBI UK)
     \item metazoa_mart_7: ENSEMBL METAZOA 7 (EBI UK)
-    \item plant_mart_7: ENSEMBL PLANT 7 (EBI UK)
+    \item plant_mart_8: ENSEMBL PLANT 8 (EBI UK)
     \item protist_mart_7: ENSEMBL PROTISTS 7 (EBI UK)
     \item ensembl_expressionmart_48: EURATMART (EBI UK)
     \item Ensembl56: PANCREATIC EXPRESSION DATABASE (INSTITUTE OF CANCER  UK)
@@ -81,10 +81,10 @@ makeTranscriptDbFromBiomart(biomart="ensembl",
 
 \examples{
 ## Discover which datasets are available in the "ensembl" and
-## "plant_mart_7" BioMart databases:
+## "plant_mart_8" BioMart databases:
 library(biomaRt)
 listDatasets(useMart("ensembl"))
-listDatasets(useMart("plant_mart_7"))
+listDatasets(useMart("plant_mart_8"))
 
 ## Retrieving an incomplete transcript dataset for Human from the
 ## "ensembl" BioMart database:
