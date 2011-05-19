@@ -11,7 +11,7 @@ importMethodsFrom(RSQLite, dbBeginTransaction, dbGetPreparedQuery)
 import(IRanges)
 
 importFrom(GenomicRanges, GRanges, Seqinfo, seqinfo)
-importMethodsFrom(GenomicRanges, seqinfo, strand)
+importMethodsFrom(GenomicRanges, strand)
 
 importClassesFrom(Biostrings, DNAString, DNAStringSet, MaskedDNAString)
 importFrom(Biostrings, "masks<-")
@@ -67,9 +67,6 @@ export(
 exportMethods(
   saveFeatures,
   metadata,
-  seqnames,
-  seqlengths,
-  isCircular,
   show,
   as.list,
   seqinfo,
