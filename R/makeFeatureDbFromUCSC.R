@@ -98,17 +98,33 @@
 
 
 
+## helper function to ID tables that rtracklayer won't process.
+checkTable <- function(query){
+  "primaryTable" %in% rtracklayer:::ucscTableOutputs(query)
+}
+
+## helper to check a track
+isGoodTrack <- function(track, session){
+  query <- ucscTableQuery(session, track=track)
+  checkTable(query)
+}
+
+## helper to detect and generate a list of "legitimate" tracks
+makeWhiteList <- function(session, trx){
+  sapply(trx, isGoodTrack, session)
+}
+
 ## Discovery for supported Tracks
 supportedUCSCFeatureDbTracks <- function(genome)
 {
-  ##TODO: fill out black list of tracks that we cannot support here.
-  ##unsupported <- c("ruler")
-  unsupported <- c("fakeTrackName")
   session <- browserSession()
   genome(session) <- genome
   query <- ucscTableQuery(session)
-  trackNames(query)[!(trackNames(query) %in% unsupported)]
+  trx <- trackNames(ucscTableQuery(session))
+  supported <- makeWhiteList(session, trx)
+  trx[supported]
 }
+
 
 ## Discover table names available in Tracks
 supportedUCSCFeatureDbTables <- function(genome, track)
@@ -116,8 +132,13 @@ supportedUCSCFeatureDbTables <- function(genome, track)
   session <- browserSession()
   genome(session) <- genome
   query <- ucscTableQuery(session, track=track)
-  tableNames(query)
+  if(checkTable(query)){
+    tableNames(query)	
+  }else{
+    stop("The track provided does not contain tables that are available in tabular form.")
+  }
 }
+
 
 ## Discover the schema information (field names and potentially someday the
 ## type information) for a track and table combo.
@@ -128,9 +149,7 @@ UCSCFeatureDbTableSchema <- function(genome,
   session <- browserSession()
   genome(session) <- genome
   ## Check that the track is available for this genome   
-  trks <- supportedUCSCFeatureDbTracks(genome)
-  track <- trks[trks %in% track]      
-  if (length(track)==0)
+  if(!isGoodTrack(track, session))
     stop("track \"", track, "\" is not supported")
   ## Check that the tablename is available for this genome
   tbls <- supportedUCSCFeatureDbTables(genome, track)
