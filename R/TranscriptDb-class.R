@@ -252,15 +252,26 @@ loadFeatures <- function(file)
     setDataFrameColClass(chrominfo, COL2CLASS)
 }
 
-setMethod("seqinfo", "TranscriptDb",
-    function(x)
-    {
-        data <- .getChromInfo(AnnotationDbi:::dbConn(x))
-        Seqinfo(seqnames = data[["chrom"]],
-                seqlengths = data[["length"]],
-                isCircular = data[["is_circular"]])
+.seqInfo <- function(x)
+{
+    data <- .getChromInfo(AnnotationDbi:::dbConn(x))
+    ## also get the genome information.
+    sql <- "SELECT value FROM metadata WHERE name='Genome'"
+    genome <- unlist(AnnotationDbi:::dbEasyQuery(AnnotationDbi:::dbConn(x),sql))
+    names(genome) <- NULL
+    if(length(genome) > 0){
+      Seqinfo(seqnames = data[["chrom"]],
+              seqlengths = data[["length"]],
+              isCircular = data[["is_circular"]],
+              genome = rep(genome,times=length(data[["chrom"]])))
+    }else{
+      Seqinfo(seqnames = data[["chrom"]],
+              seqlengths = data[["length"]],
+              isCircular = data[["is_circular"]])
     }
-)
+}
+setMethod("seqinfo", "TranscriptDb",function(x){.seqInfo(x)})
+
 
 
 ## Show should just get inherited now.
