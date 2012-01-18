@@ -51,9 +51,10 @@
   res <- sTNames[match(prefSort, sTNames)]
   paste(res[!is.na(res)], collapse="")
 }
+
 .makeTableKey <- function(x,cnames){
   sTNames <- substr(.getSimpleTableNames(x, cnames),1,1)
-  .encodeSortedTableKey(sTNames)    
+  .encodeSortedTableKey(sTNames)
 }
 
 ## for unlikely table combos 
@@ -181,7 +182,7 @@
   ## Splicing is a almost always needed, but almost never requested.
   ## cnames <- unique(c(cols, "TXID", keytype))
   ## 
-  cnames <- unique(c(cols, keytype))
+  cnames <- unique(c(keytype, cols))
   tKey <- .makeTableKey(x,cnames)
   ## message(paste("keytype generated:",tKey))
 
@@ -207,10 +208,11 @@
   res <- res[,.reverseColAbbreviations(x,cnames),drop=FALSE]
 
   ## Then sort rows and cols and drop the filtered rows etc. using .resort
-  ## from AnnoationDbi
+  ## from AnnotationDbi
   joinType <- .reverseColAbbreviations(x, keytype)
   if(dim(res)[1]>0){
-    res <- AnnotationDbi:::.resort(res, keys, joinType)
+    res <- AnnotationDbi:::.resort(res, keys, joinType,
+                                   .reverseColAbbreviations(x,cnames))
   }
   
   ## Then I need to filter out rows of NAs
