@@ -15,7 +15,6 @@ test_makeTranscriptDbFromBiomart <- function()
         "ENST00000313243",
         "ENST00000341724",
         "ENST00000400839",
-        "ENST00000400840",
         "ENST00000435657",
         "ENST00000478783"
     )
