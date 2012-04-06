@@ -176,6 +176,14 @@ disjoinExonsByGene <- function(extx, txgn) {
       split(as.character(values(exgn.orig)[["exon_id"]][queryHits(ft)]),
             values(exgn0)[["disJ_exon_id"]][subjectHits(ft)])
     orig <- orig[values(exgn0)[["disJ_exon_id"]]]
+
+    ## remove duplications
+    nn <- rep(names(orig), elementLengths(orig))
+    orig.flat <- uunlist(orig)
+    idx <- !duplicated(paste(nn, orig.flat, sep=":"))
+    nn <- nn[idx]
+    orig.flat <- orig.flat[idx]
+    orig <- split(orig.flat, nn)
    
     values(exgn0)[["exon_ids"]] <- CharacterList(orig)
     relist(exgn0, exgn)
@@ -369,7 +377,7 @@ vertex <- function(extx, txgn, map) {
     ## check for one NT long exons, if one vertices is assiciated with
     ## such an exon keep the vertices anyway
     leng <- ex.widths[exdf$Ex]
-    z <- 1:nrow(exdf)
+    z <- paste(leng, exdf$Type, exdf$Pos, sep=":")
     k <- rep("K", nrow(exdf))
     
     exdf$keep <- ifelse(unname(ex.widths[exdf$Ex]) > 1, k, z)
@@ -414,6 +422,14 @@ vertex <- function(extx, txgn, map) {
 ## creates a data frame containing all edges when a data frame of
 ## vertices is provided
 edge <- function(v) {
+
+    ## avoids duplication in the resulting outcome
+    ## very crucial step in the code
+    s <- ifelse(v$Type %in% c("[", "-"), "q", "r")
+    s <- ifelse(v$Type %in% c("]", ""), "e", s)
+
+    v <- v[v$keep == "K" | ! duplicated(paste(v$Gn, v$keep=="K",
+             v$Pos, s, sep=":")), ]
     
     ## site type
     type <- v$Type
