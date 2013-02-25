@@ -58,7 +58,8 @@
                     "caeRem"="Caenorhabditis remanei",
                     "priPac"="Pristionchus pacificus",
                     "aplCal"="Aplysia californica",
-                    "sacCer"="Saccharomyces cerevisiae")
+                    "sacCer"="Saccharomyces cerevisiae",
+                    "papAnu"="Papio anubis")
   orgToSpec[names(orgToSpec) == genome][[1]]  
 }
 
