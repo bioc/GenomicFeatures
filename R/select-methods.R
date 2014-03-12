@@ -245,7 +245,7 @@
 
   if(length(keys) > 1000){ ##Then drop the extras now(in event there are some)
       ktColId <- GenomicFeatures:::.reverseColAbbreviations(x,keytype)
-      res <-  res[res[[ktColId]] %in% keys,]
+      res <-  res[res[[ktColId]] %in% keys,,drop=FALSE]
   }
   
   
