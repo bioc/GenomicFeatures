@@ -2,6 +2,17 @@
 ### makeTranscriptDbFromGFF()
 ### -------------------------------------------------------------------------
 
+
+.UPGRADE_TO_BIOC_3_1 <- c(
+    "\n\nPlease try again with a more recent version of ",
+    "makeTranscriptDbFromGFF() by upgrading your installation to ",
+    "the lastest release of BioC (will be BioC 3.1 after 4/17/2015, ",
+    "please check the Bioconductor website at http://bioconductor.org ",
+    "and make sure you pick up the *lastest* BioC release). ",
+    "Also please note that makeTranscriptDbFromGFF() was renamed ",
+    "makeTxDbFromGFF() in BioC >= 3.1."
+)
+
 ## helper to clean up splicings
 .filterDrop <- function(data, field){
   if(any(is.na(data[[field]]))){
@@ -42,7 +53,8 @@
 ## to be called by mapply
 .assignRankings <- function(starts, strands){
   if(length(unique(strands)) >1 )
-    stop("Exon rank inference cannot accomodate trans-splicing.")
+    stop(wmsg("Exon rank inference cannot accomodate trans-splicing. ",
+              .UPGRADE_TO_BIOC_3_1))
   if (unique(strands) == "+") { 
     ord <- order(as.integer(starts))
   } else {
@@ -215,7 +227,8 @@
   dataM <- as(mcols(gff), "DataFrame")
   if(dim(dataR)[1] == dim(dataM)[1]){
       data <- cbind(dataR,dataM) ## these will always be the same height
-  }else{ stop("Error in .prepareGFF3data.frame, dataM and dataR should always match")}
+  }else{ stop(wmsg("Error in .prepareGFF3data.frame, dataM and dataR ",
+                   "should always match. ",  .UPGRADE_TO_BIOC_3_1))}
   
   ## add ExonRank and geneID info if there is any
   data <- .checkExonRank(data, gff, exonRankAttributeName)
@@ -251,10 +264,11 @@
       txs <- data[data$type=="mRNA",]
   }
   if(dim(txs)[1] < 1){
-      stop("No Transcript information found in gff file")
+      stop(wmsg("No Transcript information found in gff file. ",
+                .UPGRADE_TO_BIOC_3_1))
   }
   if(length(txs$ID) != length(unique(txs$ID))){
-      stop("Unexpected transcript duplicates")}
+      stop(wmsg("Unexpected transcript duplicates. ", .UPGRADE_TO_BIOC_3_1))}
   txs <- data.frame(txs, data.frame(tx_id=1:dim(txs)[1]),
                     stringsAsFactors=FALSE)
   as.data.frame(txs)
@@ -299,7 +313,7 @@
       names(gns) <- c("tx_id","gene_id") ## same as gns but with tx_id in tow.
   }else{ ## default case = get our data from transcript rows
       if(length(gns$ID) != length(unique(gns$ID))){
-          stop("Unexpected gene duplicates")}
+          stop(wmsg("Unexpected gene duplicates. ", .UPGRADE_TO_BIOC_3_1))}
       ## After testing for genes, here I get the actual data from mRNA rows...
       ## The only difference is that in this more normal case the Parents of
       ## these rows will be the genes that I detected previously.
@@ -320,7 +334,8 @@
     expCols <- colnames(data) %in% possibleCols  
     res <- data[data$type==type,expCols]
     if (nrow(res) == 0L && type != "CDS")
-        stop("No ", type, " information present in gff file")
+        stop(wmsg("No ", type, " information present in gff file. ",
+                  .UPGRADE_TO_BIOC_3_1))
     name <- paste0(tolower(type), "_id")
     colnames <- c("XXX_chrom","XXX_start","XXX_end","XXX_strand","type",
                   "XXX_name","tx_name","exon_rank")
@@ -503,7 +518,8 @@
   message("extracting transcript information")
   transcripts <- data
   if(length(unique(transcripts$transcript_id)) < 1){
-    stop("No Transcript information present in gtf file")
+    stop(wmsg("No Transcript information present in gtf file. ",
+              .UPGRADE_TO_BIOC_3_1))
   }else{
     ## GTF files require that we deduce the range of each transcript
     transcripts <- .deduceTranscriptsFromGTF(transcripts)
@@ -658,21 +674,28 @@ makeTranscriptDbFromGFF <- function(file,
   feature.type <- c("gene", "mRNA", "exon", "CDS")
   gff <- import(file, format=format, feature.type=feature.type,
                 asRangedData=FALSE)
+  if (length(gff) == 0L)
+    stop(wmsg("No line in the file has one of the expected types (",
+              paste0(feature.type, collapse=", "), "). ",
+              .UPGRADE_TO_BIOC_3_1))
 
   if(format=="gff3"){
     ## check that we have ID, Parent
-    if(all(c("ID","Parent") %in% colnames(mcols(gff)))){
-      tables <- .prepareGFF3Tables(gff, exonRankAttributeName,
-                                   gffGeneIdAttributeName,
-                                   useGenesAsTranscripts)
-      ## results come back in list like: tables$transctripts etc.
-    }
+    if (!all(c("ID","Parent") %in% colnames(mcols(gff))))
+      stop(wmsg("makeTranscriptDbFromGFF() expects attributes ",
+                "'ID' and 'Parent' in GFF3 file. ",
+                .UPGRADE_TO_BIOC_3_1))
+    tables <- .prepareGFF3Tables(gff, exonRankAttributeName,
+                                 gffGeneIdAttributeName,
+                                 useGenesAsTranscripts)
+    ## results come back in list like: tables$transctripts etc.
   }else if(format=="gtf"){
     ## check that we have gene_id and transcript_id
-    if(all(c("gene_id","transcript_id")
-           %in% colnames(mcols(gff)))){
-      tables <- .prepareGTFTables(gff,exonRankAttributeName)
-    }
+    if(!all(c("gene_id","transcript_id") %in% colnames(mcols(gff))))
+      stop(wmsg("makeTranscriptDbFromGFF() expects attributes ",
+                "'gene_id' and 'transcript_id' in GTF file. ",
+                .UPGRADE_TO_BIOC_3_1))
+    tables <- .prepareGTFTables(gff,exonRankAttributeName)
   }
   ## TODO: verify that I have all I really need for metadata
   ## build up the metadata
