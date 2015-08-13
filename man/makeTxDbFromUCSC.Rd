@@ -19,10 +19,6 @@
 \usage{
 supportedUCSCtables()
 
-getChromInfoFromUCSC(
-        genome,
-        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
-
 makeTxDbFromUCSC(
         genome="hg19",
         tablename="knownGene",
@@ -31,6 +27,10 @@ makeTxDbFromUCSC(
         url="http://genome.ucsc.edu/cgi-bin/",
         goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath",
         miRBaseBuild=NA)
+
+getChromInfoFromUCSC(
+        genome,
+        goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 }
 \arguments{
   \item{genome}{genome abbreviation used by UCSC and obtained by
@@ -63,7 +63,12 @@ makeTxDbFromUCSC(
   that feeds data from a BioMart database.
 }
 
-\value{A \link{TxDb} object.}
+\value{
+  A \link{TxDb} object for \code{makeTxDbFromUCSC}.
+
+  A data frame with 1 row per chromosome (or scaffold) and with columns
+  \code{chrom} and \code{length} for \code{getChromInfoFromUCSC}.
+}
 
 \author{
   M. Carlson and H. Pages
@@ -94,20 +99,25 @@ makeTxDbFromUCSC(
 }
 
 \examples{
-## Display the list of genomes available at UCSC:
+## ---------------------------------------------------------------------
+## A. BASIC USAGE
+## ---------------------------------------------------------------------
+
+## Use ucscGenomes() from the rtracklayer package to display the list of
+## genomes available at UCSC:
 library(rtracklayer)
 ucscGenomes()[ , "db"]
 
 ## Display the list of tables supported by makeTxDbFromUCSC():
 supportedUCSCtables()
 
-\dontrun{
-## Retrieving a full transcript dataset for Yeast from UCSC:
-txdb1 <- makeTxDbFromUCSC(genome="sacCer2", tablename="ensGene")
-}
+## Retrieve a full transcript dataset for Yeast from UCSC:
+txdb1 <- makeTxDbFromUCSC(genome="sacCer3", tablename="ensGene",
+                          circ_seqs="chrM")
+txdb1
 
-## Retrieving an incomplete transcript dataset for Mouse from UCSC
-## (only transcripts linked to Entrez Gene ID 22290):
+## Retrieve an incomplete transcript dataset for Mouse from UCSC (only
+## transcripts linked to Entrez Gene ID 22290):
 transcript_ids <- c(
     "uc009uzf.1",
     "uc009uzg.1",
@@ -116,7 +126,15 @@ transcript_ids <- c(
     "uc009uzj.1"
 )
 
-txdb2 <- makeTxDbFromUCSC(genome="mm9", tablename="knownGene",
-                          transcript_ids=transcript_ids)
+txdb2 <- makeTxDbFromUCSC(genome="mm10", tablename="knownGene",
+                          transcript_ids=transcript_ids,
+                          circ_seqs="chrM")
 txdb2
+
+## ---------------------------------------------------------------------
+## B. RETRIEVING CHROMOSOME INFORMATION ONLY
+## ---------------------------------------------------------------------
+
+chrominfo <- getChromInfoFromUCSC(genome="hg38")
+chrominfo
 }

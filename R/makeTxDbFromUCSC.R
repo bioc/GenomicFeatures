@@ -452,7 +452,7 @@ supportedUCSCtables <- function()
         query <- ucscTableQuery(session, table=tablename)
         ucsc_table <- getTable(query)
         message("OK")
-        if (!all(hasCol(ucsc_table, c(Lcolname, Rcolname))))
+        if (!all(has_col(ucsc_table, c(Lcolname, Rcolname))))
             stop("expected cols \"", Lcolname, "\" or/and \"",
                  Rcolname, "\" not found in table ", tablename)
         Lcol <- ucsc_table[[Lcolname]]
@@ -683,7 +683,7 @@ supportedUCSCtables <- function()
 ### Download and preprocess the 'chrominfo' data frame.
 ###
 
-.makeUCSCChrominfo <- function(genome, circ_seqs,
+.makeUCSCChrominfo <- function(genome, circ_seqs=DEFAULT_CIRC_SEQS,
         goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
     message("Download and preprocess the 'chrominfo' data frame ... ",
@@ -699,25 +699,23 @@ supportedUCSCtables <- function()
     chrominfo <- data.frame(
         chrom=ucsc_chrominfotable$chrom,
         length=ucsc_chrominfotable$size,
-        is_circular=matchCircularity(ucsc_chrominfotable$chrom, circ_seqs)
+        is_circular=make_circ_flags_from_circ_seqs(ucsc_chrominfotable$chrom,
+                                                   circ_seqs)
     )
-    chrom_ids <- rankSeqlevels(chrominfo$chrom)
-    chrominfo <- chrominfo[order(chrom_ids), ]
+    oo <- order(rankSeqlevels(chrominfo[ , "chrom"]))
+    chrominfo <- chrominfo[oo, , drop=FALSE]
+    rownames(chrominfo) <- NULL
     message("OK")
     chrominfo
 }
 
-
-### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Allow users to discover 'chrominfo' data frame.
-###
-
+## User-friendly wrapper to .makeUCSCChrominfo().
 getChromInfoFromUCSC <- function(genome,
           goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath")
 {
-  chromInfo <-.makeUCSCChrominfo(genome, circ_seqs=character(),
+  chrominfo <-.makeUCSCChrominfo(genome, circ_seqs=character(),
                                  goldenPath_url=goldenPath_url)
-  chromInfo[,1:2]
+  chrominfo[ , 1:2]
 }
 
 
@@ -753,7 +751,7 @@ getChromInfoFromUCSC <- function(genome,
 .makeTxDbFromUCSCTxTable <- function(ucsc_txtable, genes,
         genome, tablename, gene_id_type,
         full_dataset,
-        circ_seqs,
+        circ_seqs=DEFAULT_CIRC_SEQS,
         goldenPath_url="http://hgdownload.cse.ucsc.edu/goldenPath",
         miRBaseBuild=NA)
 {
