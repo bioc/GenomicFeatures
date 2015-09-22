@@ -125,7 +125,7 @@ exportMethods(
   species, organism,
   show,
   as.list,
-  seqinfo, "seqinfo<-",
+  seqlevels0, "seqlevels<-", seqinfo,
   transcripts, exons, cds, genes,
   promoters,
   disjointExons,
