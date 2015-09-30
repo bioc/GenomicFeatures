@@ -435,15 +435,12 @@ setReplaceMethod("seqlevels", "TxDb",
     }
 )
 
-.seqinfo.TxDb <- function(x)
+get_TxDb_seqinfo0 <- function(x)
 {
     data <- load_chrominfo(x, set.col.class=TRUE)
-    ## We take the seqnames from x's private field 'user_seqlevels'.
-    ans <- Seqinfo(seqnames=x$user_seqlevels, ## stored correctly already
-                   seqlengths=data[["length"]][x$user2seqlevels0],
-                   isCircular=data[["is_circular"]][x$user2seqlevels0])
-    ## Then re-arrange the ans value based on the user2seqlevels0 values
-    ## also get the genome information.
+    ans <- Seqinfo(seqnames=data[ , "chrom"],
+                   seqlengths=data[ , "length"],
+                   isCircular=data[ , "is_circular"])
     sql <- "SELECT value FROM metadata WHERE name='Genome'"
     genome <- unlist(queryAnnotationDb(x, sql))
     names(genome) <- NULL
@@ -452,7 +449,15 @@ setReplaceMethod("seqlevels", "TxDb",
     ans
 }
 
-setMethod("seqinfo", "TxDb", function(x){.seqinfo.TxDb(x)})
+.get_TxDb_seqinfo <- function(x)
+{
+    seqinfo0 <- get_TxDb_seqinfo0(x)
+    ans <- seqinfo0[seqlevels(seqinfo0)[x$user2seqlevels0]]
+    seqnames(ans) <- x$user_seqlevels
+    ans
+}
+
+setMethod("seqinfo", "TxDb", .get_TxDb_seqinfo)
 
 setGeneric("isActiveSeq", function(x) standardGeneric("isActiveSeq"))
 
@@ -502,14 +507,35 @@ setReplaceMethod("isActiveSeq","TxDb",
     {
         #.Deprecated("seqlevels", package="GenomicFeatures")
         value <- .mk_isActiveSeqReplacementValue(x, value)
-        x$isActiveSeq <- unname(value)
+        x$isActiveSeq[txdb$user2seqlevels0] <- unname(value)
         x
     }
 )
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-### Comparing 2 TxDb objects.
+### keep_user_seqlevels_from_TxDb()
+###
+### Used by the TxDb extractors to correct the seqlevels of GRanges or
+### GRangesList object 'x' before it's returned to the user. The correction
+### is made according to the "user defined" and "active" seqlevels that are
+### currently set on TxDb object 'txdb'.
+### 'x' is assumed to have the original TxDb seqlevels on it.
+
+keep_user_seqlevels_from_TxDb <- function(x, txdb)
+{
+    stopifnot(setequal(seqlevels(x), seqlevels0(txdb)))
+    from_seqlevels <- seqlevels0(txdb)[txdb$user2seqlevels0]
+    to_seqlevels <- txdb$user_seqlevels
+    new_seqlevels <- setNames(to_seqlevels, from_seqlevels)
+    new_seqlevels <- new_seqlevels[txdb$isActiveSeq[txdb$user2seqlevels0]]
+    seqlevels(x, force=TRUE) <- new_seqlevels
+    x
+}
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Comparing 2 TxDb objects
 ###
 
 ### Used in unit tests for makeTxDbFromGRanges().
