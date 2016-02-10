@@ -144,9 +144,7 @@ makeTxDb(transcripts, splicings,
 
 \value{A \link{TxDb} object.}
 
-\author{
-  H. Pages
-}
+\author{Hervé Pagès}
 
 \seealso{
   \itemize{
