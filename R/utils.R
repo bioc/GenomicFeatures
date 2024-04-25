@@ -18,7 +18,7 @@ load_package_gracefully <- function(package, ...)
 
 call_fun_in_txdbmaker <- function(fun, ...)
 {
-    load_package_gracefully("txdbmaker", "Starting with BioC 3.19, ",
+    load_package_gracefully("txdbmaker", "starting with BioC 3.19, ",
                             "calling ", fun, "()")
     msg <- c(fun, "() has moved to the txdbmaker package. Please ",
              "call txdbmaker::", fun, "() to get rid of this warning.")
