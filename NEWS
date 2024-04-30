@@ -1,3 +1,41 @@
+CHANGES IN VERSION 1.56.0
+-------------------------
+
+NEW FEATURES
+
+    o Add getTerminatorSeq(). Same as getPromoterSeq() but for terminator
+      sequences.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o The makeTxDb*() functions and related have moved to the new txdbmaker
+      package. Full list:
+        - makeTxDb
+        - supportedUCSCtables
+        - browseUCSCtrack
+        - makeTxDbFromUCSC
+        - getChromInfoFromBiomart
+        - makeTxDbFromBiomart
+        - makeTxDbFromEnsembl
+        - makeTxDbFromGRanges
+        - makeTxDbFromGFF
+        - supportedUCSCFeatureDbTracks
+        - supportedUCSCFeatureDbTables
+        - UCSCFeatureDbTableSchema
+        - makeFeatureDbFromUCSC
+        - supportedMiRBaseBuildValues
+        - makePackageName
+        - makeTxDbPackage
+        - makeTxDbPackageFromUCSC
+        - makeFDbPackageFromUCSC
+        - makeTxDbPackageFromBiomart
+      Note that they are still temporarily defined in GenomicFeatures but now
+      they just call the corresponding function in txdbmaker. Since this is a
+      temporary redirect, the user also gets a warning that tells them to use
+      the fully qualified name (e.g. txdbmaker::makeTxDbFromUCSC()) to call
+      the function.
+
+
 CHANGES IN VERSION 1.54.0
 -------------------------
 
