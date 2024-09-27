@@ -12,7 +12,7 @@ gc()
 
 ### Concrete GenomicFeatures types
 .TxDb <-
-    setRefClass("TxDb", contains="AnnotationDb",
+    setRefClass("TxDb", contains=c("AnnotationDb", "OutOfMemoryObject"),
         fields=list(user2seqlevels0="integer",
                     user_seqlevels="character",
                     user_genome="character",
@@ -31,6 +31,23 @@ gc()
               }
           .self
       }))
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### saveRDS() method
+###
+
+setMethod("saveRDS", "TxDb",
+    function(object, file="", ascii=FALSE, version=NULL,
+             compress=TRUE, refhook=NULL)
+    {
+        stop(wmsg("TxDb objects contain out-of-memory data ",
+                  "so cannot be serialized reliably. Please use ",
+                  "saveDb() from the AnnotationDbi package instead. ",
+                  "Also see '?containsOutOfMemoryData' in the ",
+                  "BiocGenerics package for some context."))
+    }
+)
 
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

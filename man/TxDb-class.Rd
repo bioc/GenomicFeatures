@@ -4,6 +4,8 @@
 \alias{class:TxDb}
 \alias{TxDb}
 
+\alias{saveRDS,TxDb-method}
+
 \alias{organism,TxDb-method}
 \alias{seqlevels0,TxDb-method}
 \alias{seqlevels<-,TxDb-method}
