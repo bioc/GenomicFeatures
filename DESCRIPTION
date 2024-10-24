@@ -1,15 +1,13 @@
 Package: GenomicFeatures
-Title: Conveniently import and query gene models
-Description: A set of tools and methods for making and manipulating
-	transcript centric annotations. With these tools the user can
-	easily download the genomic locations of the transcripts, exons
-	and cds of a given organism, from either the UCSC Genome
-	Browser or a BioMart database (more sources will be supported
-	in the future). This information is then stored in a local
-	database that keeps track of the relationship between
-	transcripts, exons, cds and genes. Flexible methods are
-	provided for extracting the desired features in a convenient
-	format.
+Title: Query the gene models of a given organism/assembly
+Description: Extract the genomic locations of genes, transcripts, exons,
+	introns, and CDS, for the gene models stored in a TxDb object.
+	A TxDb object is a small database that contains the gene models of
+	a given organism/assembly. Bioconductor provides a small collection
+	of TxDb objects in the form of ready-to-install TxDb packages for
+	the most commonly studied organisms. Additionally, the user can
+	easily make a TxDb object (or package) for the organism/assembly
+	of their choice by using the tools from the txdbmaker package.
 biocViews: Genetics, Infrastructure, Annotation, Sequencing,
 	GenomeAnnotation
 URL: https://bioconductor.org/packages/GenomicFeatures
