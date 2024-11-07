@@ -1,4 +1,6 @@
 \name{mapToTranscripts}
+
+\alias{coordinate-mapping-methods}
 \alias{coordinate-mapping}
 
 \alias{mapToTranscripts}
@@ -140,8 +142,8 @@
   \code{ignore.strand} argument.
   See the section on \code{ignore.strand} for details.
 
-  \itemize{
-    \item{\code{mapToTranscripts}, \code{pmapToTranscripts}}{
+  \describe{
+    \item{\code{mapToTranscripts}, \code{pmapToTranscripts}:}{
       The genomic range in \code{x} is mapped to the local position in the
       \code{transcripts} ranges. A successful mapping occurs when \code{x}
       is completely within the \code{transcripts} range, equivalent to:
@@ -166,7 +168,7 @@
       or strand mismatch) are returned as zero-width ranges starting at 0.
       These ranges are given the seqname of "UNMAPPED".
     }
-    \item{\code{mapFromTranscripts}, \code{pmapFromTranscripts}}{
+    \item{\code{mapFromTranscripts}, \code{pmapFromTranscripts}:}{
       The transcript-based position in \code{x} is mapped to genomic coordinates
       using the ranges in \code{transcripts}. A successful mapping occurs when
       the following is TRUE:
