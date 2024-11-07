@@ -20,9 +20,11 @@ call_fun_in_txdbmaker <- function(fun, ...)
 {
     load_package_gracefully("txdbmaker", "starting with BioC 3.19, ",
                             "calling ", fun, "()")
-    msg <- c(fun, "() has moved to the txdbmaker package. Please ",
-             "call txdbmaker::", fun, "() to get rid of this warning.")
-    warning(wmsg(msg))
+    msg <- c(fun, "() has moved from GenomicFeatures to the txdbmaker ",
+             "package, and is formally deprecated in GenomicFeatures ",
+             ">= 1.59.1. Please call txdbmaker::", fun, "() to get rid ",
+             "of this warning.")
+    .Deprecated(msg=wmsg(msg))
     FUN <- base::get(fun, envir=asNamespace("txdbmaker"), inherits=FALSE)
     do.call(FUN, list(...))
 }
